@@ -9,8 +9,8 @@
  * Acknowledgement
  * ---------------
  *
- * I'm using xoshiro256+ 1.0 (David Blackman and Sebastiano Vigna) and splitmix64 (Sebastiano Vigna)
- * methods for random number generation.
+ * I'm using xoshiro256+ 1.0 (David Blackman and Sebastiano Vigna) and
+ * splitmix64 (Sebastiano Vigna) methods for random number generation.
  *
  * - https://prng.di.unimi.it
  * - https://github.com/svaarala/duktape/blob/master/misc/splitmix64.c
@@ -25,14 +25,21 @@ struct random
     uint64_t data[4];
 };
 
-/* A standard double (64-bit) floating-point number in IEEE floating point format has 52 bits of significand, plus an
- * implicit bit at the left of the significand. Thus, the representation can actually store numbers with 53 significant
- * binary digits. */
-static inline double __random_u64_to_dbl(uint64_t x) { return (x >> 11) * 0x1.0p-53; }
+/* A standard double (64-bit) floating-point number in IEEE floating point
+ * format has 52 bits of significand, plus an implicit bit at the left of the
+ * significand. Thus, the representation can actually store numbers with 53
+ * significant binary digits. */
+static inline double __random_u64_to_dbl(uint64_t x)
+{
+    return (x >> 11) * 0x1.0p-53;
+}
 
-static inline uint64_t __random_rotl(const uint64_t x, int k) { return (x << k) | (x >> (64 - k)); }
+static inline uint64_t __random_rotl(const uint64_t x, int k)
+{
+    return (x << k) | (x >> (64 - k));
+}
 
-static uint64_t random_u64(struct random* rnd)
+static uint64_t random_u64(struct random *rnd)
 {
     const uint64_t result = rnd->data[0] + rnd->data[3];
 
@@ -50,7 +57,7 @@ static uint64_t random_u64(struct random* rnd)
     return result;
 }
 
-uint64_t __random_splitmix64_next(uint64_t* x)
+static uint64_t __random_splitmix64_next(uint64_t *x)
 {
     uint64_t z = (*x += UINT64_C(0x9E3779B97F4A7C15));
     z = (z ^ (z >> 30)) * UINT64_C(0xBF58476D1CE4E5B9);
@@ -68,6 +75,9 @@ static struct random random(uint64_t seed)
     return r;
 }
 
-static inline double random_dbl(struct random* rnd) { return __random_u64_to_dbl(random_u64(rnd)); }
+static inline double random_dbl(struct random *rnd)
+{
+    return __random_u64_to_dbl(random_u64(rnd));
+}
 
 #endif
