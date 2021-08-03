@@ -2,7 +2,7 @@
  * Usage example
  * -------------
  *
- * struct random rnd = random(1);
+ * struct xrandom rnd = xrandom(1);
  * double dbl_value = random_dbl(&rnd);
  * uint64_t u64_value = random_u64(&rnd);
  *
@@ -15,12 +15,12 @@
  * - https://prng.di.unimi.it
  * - https://github.com/svaarala/duktape/blob/master/misc/splitmix64.c
  */
-#ifndef RANDOM_H
-#define RANDOM_H
+#ifndef XRANDOM_H
+#define XRANDOM_H
 
 #include <stdint.h>
 
-struct random
+struct xrandom
 {
     uint64_t data[4];
 };
@@ -31,7 +31,7 @@ struct random
  * significant binary digits. */
 static inline double __random_u64_to_dbl(uint64_t x)
 {
-    return (x >> 11) * 0x1.0p-53;
+    return (double)(x >> 11) * 0x1.0p-53;
 }
 
 static inline uint64_t __random_rotl(const uint64_t x, int k)
@@ -39,7 +39,7 @@ static inline uint64_t __random_rotl(const uint64_t x, int k)
     return (x << k) | (x >> (64 - k));
 }
 
-static uint64_t random_u64(struct random *rnd)
+static uint64_t random_u64(struct xrandom *rnd)
 {
     const uint64_t result = rnd->data[0] + rnd->data[3];
 
@@ -65,9 +65,9 @@ static uint64_t __random_splitmix64_next(uint64_t *x)
     return z ^ (z >> 31);
 }
 
-static struct random random(uint64_t seed)
+static struct xrandom xrandom(uint64_t seed)
 {
-    struct random r;
+    struct xrandom r;
     r.data[0] = __random_splitmix64_next(&seed);
     r.data[1] = __random_splitmix64_next(&seed);
     r.data[2] = __random_splitmix64_next(&seed);
@@ -75,7 +75,7 @@ static struct random random(uint64_t seed)
     return r;
 }
 
-static inline double random_dbl(struct random *rnd)
+static inline double random_dbl(struct xrandom *rnd)
 {
     return __random_u64_to_dbl(random_u64(rnd));
 }
